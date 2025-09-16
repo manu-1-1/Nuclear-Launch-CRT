@@ -65,6 +65,64 @@ public:
         return (int64)(result%prod);
     }
 };
+
+class user{
+protected:
+    int id;
+    int64 mod;
+    int64 share;
+
+public:
+    user(int i){
+        id=i;
+        mod=0;
+        share=0
+    }
+    virtual void eS(){
+        cout<<"Participant "<<id<<" entering share.."<< endl;
+    }
+    int getId() const{
+        return id;
+    }
+    int64 getMod() const{
+        return mod;
+    }
+    int64 getShare() const{
+        return share;
+    }
+};
+
+class Minister : public user{
+public:
+    Minister(int i):user(i){
+
+    }
+    void setShare(int64 val,int64 mod){
+        share=val;
+        mod=mod;
+    }
+    void setShare(int64 val){
+        share = val;
+    }
+    int verify(int64 input) const {
+        if(input==share){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    void eS() override{
+        int64 val;
+        cout<<"Minister "<<id<<", enter your share value: ";
+        cin>>val;
+        if (verify(val)){
+            cout<<"Accepted from Minister "<<id<<endl;
+        }else{
+            cout<<"Rejected from Minister "<<id<<endl;
+        }
+    }
+};
+
 int main(){
     return 0;
 }
