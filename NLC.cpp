@@ -121,6 +121,7 @@ public:
             cout<<"Rejected from Minister "<<id<<endl;
         }
     }
+    friend class CRTsolver;
 };
 
 int main(){
