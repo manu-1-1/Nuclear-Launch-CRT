@@ -5,7 +5,7 @@
 #include <algorithm>
 using namespace std;
 using int64=long long;
-using int128 = __int128_t;
+using int128=__int128_t;
 
 class Pg{
 public:
@@ -26,7 +26,7 @@ public:
     }
 };
 
-class CryptoUtils{
+class gi{
 public:
     static int64 gcd(int64 a, int64 b, int64 &x, int64 &y){
         if (b==0){
@@ -54,15 +54,17 @@ class CRTsolver{
 public:
     static int64 solver(const vector<int64>& mods, const vector<int64>& rems){
         int128 prod=1;
-        for (auto m:mods)prod *= (int128)m;
+        for (auto m:mods){
+            prod *= (int128)m;
+        }
         int128 result = 0;
-        for (size_t i = 0; i < mods.size(); ++i){
+        for (int i = 0; i < mods.size(); ++i){
             int128 m_i = mods[i];
             int128 r_i = rems[i];
             int128 p = prod / m_i;
-            int64 inv = CryptoUtils::mod_inv((int64)(p%m_i), mods[i]);
+            int64 inv = gi::mod_inv((int64)(p%m_i), mods[i]);
             if (inv == -1) {
-                cout<<"Error: Could not find modular inverse"<<endl;
+                cout<<"Could not find modular  inverse"<<endl;
                 return -1;
             }
             result += r_i*(int128)inv*p;
@@ -163,14 +165,15 @@ public:
         for(int i = n-k+1; i < n; i++) {
             lb *= (int128)sorted_mods[i];
         }
-        uniform_int_distribution<long long> dist(1, (long long)(ub-1));
+        uniform_int_distribution<int64> dist((int64)(lb+1), (int64)(ub-1));
         secret = dist(rng);
+
         for(int i=0;i<n;i++){
             int64 sh = (int64)(secret % (int128)mods[i]);
             ministers[i].setShare(sh, mods[i]);
         }
 
-        cout<<"\n[System] Secret (hidden in real system): "<<(int64)secret<<endl;
+        cout<<"\nSecret (hidden): "<<(int64)secret<<endl;
         cout<<"\nDistributed shares\n";
         for(int i=0;i<n;i++){
             cout<<"Minister "<<ministers[i].getId()<<": m="<<ministers[i].getMod()<<"  share="<<ministers[i].getShare()<<"\n";
