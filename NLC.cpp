@@ -1,11 +1,15 @@
-#include<iostream>
+#include <iostream>
 #include <vector>
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <string>
+#include <sstream>
+
 using namespace std;
 using int64=long long;
-using int128=__int128_t;
+using int128=long long; 
+
 
 class Pg{
 public:
@@ -58,13 +62,12 @@ public:
             prod *= (int128)m;
         }
         int128 result = 0;
-        for (int i = 0; i < mods.size(); ++i){
+        for (size_t i = 0; i < mods.size(); ++i){
             int128 m_i = mods[i];
             int128 r_i = rems[i];
             int128 p = prod / m_i;
             int64 inv = gi::mod_inv((int64)(p%m_i), mods[i]);
             if (inv == -1) {
-                cout<<"Could not find modular  inverse"<<endl;
                 return -1;
             }
             result += r_i*(int128)inv*p;
@@ -73,175 +76,115 @@ public:
     }
 };
 
-class user{
-protected:
+
+struct Share {
     int id;
-    int64 mod;
     int64 share;
-
-public:
-    user(int i){
-        id=i;
-        mod=0;
-        share=0;
-    }
-    virtual void eS(){
-        cout<<"Participant "<<id<<" entering share..."<<endl;
-    }
-    int getId(){
-        return id;
-    }
-    int64 getMod(){
-        return mod;
-    }
-    int64 getShare(){
-        return share;
-    }
+    int64 mod;
 };
 
-class Minister : public user{
-public:
-    Minister(int i) : user(i){}
-    void setShare(int64 val, int64 m){
-        share = val;
-        mod=m;
-    }
-    void setShare(int64 val){
-        share = val;
-    }
-    int verify(int64 input){
-        if(input==share){
-            return 1;
-        }else{
-            return 0;
-        }
-    }
+void generate_shares(int n, int k) {
+    mt19937_64 rng((uint64_t)chrono::high_resolution_clock::now().time_since_epoch().count());
+    vector<int64> mods;
 
-    void eS() override{
-        int64 val;
-        cout<<"Minister "<<id<<", enter your share value: ";
-        cin>>val;
-        if (verify(val)){
-            cout<<"Accepted from Minister "<<id<<endl;
-        }else{
-            cout<<"Rejected from Minister "<<id<<endl;
-        }
+    uniform_int_distribution<int64> prime_dist(1000, 5000); 
+    int64 p = prime_dist(rng); 
+    
+    while((int)mods.size() < n){
+        p = Pg::np(p);
+        mods.push_back(p);
+        ++p;
     }
-    friend class CRTsolver;
-};
+    vector<int64> sorted_mods = mods;
+    sort(sorted_mods.begin(), sorted_mods.end());
 
-class SS{
-private:
-    const int n;
-    const int k;
-    int128 secret;
-    vector<Minister> ministers;
-
-public:
-    SS(int total, int threshold) : n(total), k(threshold) {
-        for(int i=1;i<=n;i++){
-            ministers.push_back(i);
-        }
+    int128 ub = 1;
+    for(int i = 0; i < k; i++) {
+        ub *= (int128)sorted_mods[i];
     }
 
-    void create(){
-        mt19937_64 rng((uint64_t)chrono::high_resolution_clock::now().time_since_epoch().count());
-        vector<int64> mods;
-        int64 p = 101;
-        while((int)mods.size() < n){
-            p=Pg::np(p);
-            mods.push_back(p);
-            ++p;
-        }
-        vector<int64> sorted_mods = mods;
-        sort(sorted_mods.begin(), sorted_mods.end());
-
-        int128 ub= 1;
-        for(int i = 0; i < k; i++) {
-            ub *= (int128)sorted_mods[i];
-        }
-
-        int128 lb= 1;
-        for(int i = n-k+1; i < n; i++) {
-            lb *= (int128)sorted_mods[i];
-        }
-        uniform_int_distribution<int64> dist((int64)(lb+1), (int64)(ub-1));
-        secret = dist(rng);
-
-        for(int i=0;i<n;i++){
-            int64 sh = (int64)(secret % (int128)mods[i]);
-            ministers[i].setShare(sh, mods[i]);
-        }
-
-        cout<<"\nSecret (hidden): "<<(int64)secret<<endl;
-        cout<<"\nDistributed shares\n";
-        for(int i=0;i<n;i++){
-            cout<<"Minister "<<ministers[i].getId()<<": m="<<ministers[i].getMod()<<"  share="<<ministers[i].getShare()<<"\n";
-        }
-        cout<<endl;
+    int128 lb = 1;
+    for(int i = n-k+1; i < n; i++) {
+        lb *= (int128)sorted_mods[i];
+    }
+    
+    if (lb >= ub) {
+        ub = lb + 1000; 
     }
 
-    void launch(){
-        int users;
-        cout<<"\nHow many ministers will enter their shares today? ";
-        cin>>users;
-        if (users < k){
-            cout<<"Not enough participants. Launch Aborted!\n";
-            return;
-        }
-        if (users > n){
-            cout<<"Participants > total ministers. Launch Aborted!\n";
-            return;
-        }
-        vector<int> c(n,0);
-        vector<int64> usedmods;
-        vector<int64> usedrems;
-        int collect = 0;
-        while(collect < users){
-            int i;
-            cout<<"\nEnter minister index (1-"<<n<<"): ";
-            cin>>i;
-            if(i<1 || i>n){
-                cout << "Invalid index. Try again.\n";
-                continue;
-            }
-            if(c[i-1]){
-                cout<<"Minister already submitted. Pick another.\n";
-                continue;
-            }
+    uniform_int_distribution<int64> dist((int64)(lb+1), (int64)(ub-1));
+    int64 secret = dist(rng);
 
-            cout<<"Enter share value: ";
-            int64 val;
-            cin>>val;
-            if(!ministers[i-1].verify(val)){
-                cout<<"\nIncorrect share by Minister "<<i<<" LAUNCH ABORTED.\n";
-                return;
-            }
-            cout<<"Accepted from Minister "<<i<<endl;
-            c[i-1] = 1;
-            usedmods.push_back(ministers[i-1].getMod());
-            usedrems.push_back(val);
-            ++collect;
-        }
-
-        int64 r = CRTsolver::solver(usedmods, usedrems);
-        if (r == -1){
-            cout<<"\nReconstruction failed. Launch Aborted!\n";
-            return;
-        }
-        cout<<"\nReconstructed = "<<r<< endl;
-        if(r == (int64)secret){
-            cout<<"Launch Authorized!\n";
-        }else{
-            cout<<"Reconstruction mismatch, Launch Aborted!\n";
-        }
+    cout << "{";
+    cout << "\"secret\": \"" << secret << "\",";
+    cout << "\"shares\": [";
+    for(int i=0; i<n; i++){
+        int64 sh = (int64)(secret % (int128)mods[i]);
+        cout << "{\"id\": " << (i+1) << ", \"share\": \"" << sh << "\", \"mod\": \"" << mods[i] << "\"}";
+        if (i < n-1) cout << ",";
     }
-};
+    cout << "]}";
+}
 
-int main(){
-    cout<<"CRT Mignotte Secret-Sharing Nuclear Launch\n";
-    SS s(5,3);
-    s.create();
-    s.launch();
+void reconstruct_secret(string json_input) {
+    vector<int64> mods;
+    vector<int64> rems;
+    
+    size_t pos = 0;
+    while(true) {
+        size_t share_pos = json_input.find("\"share\":", pos);
+        if (share_pos == string::npos) break;
+        
+        size_t start_quote = json_input.find("\"", share_pos + 8);
+        size_t end_quote = json_input.find("\"", start_quote + 1);
+        string share_str = json_input.substr(start_quote + 1, end_quote - start_quote - 1);
+         
+        size_t mod_pos = json_input.find("\"mod\":", end_quote);
+        size_t mod_start_quote = json_input.find("\"", mod_pos + 6);
+        size_t mod_end_quote = json_input.find("\"", mod_start_quote + 1);
+        string mod_str = json_input.substr(mod_start_quote + 1, mod_end_quote - mod_start_quote - 1);
+        
+        try {
+            rems.push_back(stoll(share_str));
+            mods.push_back(stoll(mod_str));
+        } catch (...) {
+            break;
+        }
+        
+        pos = mod_end_quote;
+    }
+    
+    int64 secret = CRTsolver::solver(mods, rems);
+    
+     cout << "{";
+     if (secret == -1) {
+         cout << "\"error\": \"reconstruction failed\"";
+     } else {
+         cout << "\"secret\": \"" << secret << "\"";
+     }
+     cout << "}";
+}
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        return 1;
+    }
+
+    string mode = argv[1];
+    
+    if (mode == "generate") {
+        generate_shares(5, 3);
+    } else if (mode == "reconstruct") {
+        string input;
+        if (argc >= 3) {
+            input = argv[2];
+        } else {
+             stringstream buffer;
+             buffer << cin.rdbuf(); 
+             input = buffer.str();
+        }
+        reconstruct_secret(input);
+    }
+
     return 0;
 }
