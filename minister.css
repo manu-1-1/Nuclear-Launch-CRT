@@ -1,0 +1,99 @@
+:root {
+    --bg-color: #2c3e50;
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --primary-text: #ffffff;
+    --accent-color: #6a82fb;
+    --input-bg: rgba(0,0,0,0.3);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    margin: 0;
+    padding: 20px;
+    color: var(--primary-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 500px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 30px 40px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: var(--primary-text);
+}
+
+.minister-box {
+    margin-bottom: 20px;
+}
+
+.minister-box label {
+    font-weight: 400;
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.minister-box input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--input-bg);
+    color: var(--primary-text);
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.minister-box input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.minister-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 20px var(--accent-color);
+}
+
+button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+button i {
+    margin-right: 10px;
+}

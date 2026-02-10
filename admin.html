@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fas fa-satellite-dish"></i>NUCLEAR LAUNCH CODES USING CRT</h1>
+    </header>
+
+    <div class="controls">
+        <button id="generateSharesBtn"><i class="fas fa-cogs"></i> Generate Shares</button>
+        <button id="initiateLaunchBtn"><i class="fas fa-rocket"></i> Initiate Launch</button>
+        <button id="abortSessionBtn"><i class="fas fa-ban"></i> Abort Session</button>
+    </div>
+
+    <div id="timer"></div>
+
+    <div class="section">
+        <h2><i class="fas fa-key"></i> Share Generation Progress</h2>
+        <div class="boxes">
+            <div class="box" id="minister1">Minister 1</div>
+            <div class="box" id="minister2">Minister 2</div>
+            <div class="box" id="minister3">Minister 3</div>
+            <div class="box" id="minister4">Minister 4</div>
+            <div class="box" id="minister5">Minister 5</div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="generationProgress"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-user-check"></i> Share Verification</h2>
+        <div class="boxes">
+            <div class="box" id="vminister1">Minister 1</div>
+            <div class="box" id="vminister2">Minister 2</div>
+            <div class="box" id="vminister3">Minister 3</div>
+            <div class="box" id="vminister4">Minister 4</div>
+            <div class="box" id="vminister5">Minister 5</div>
+        </div>
+    </div>
+
+    <div id="launch-message"></div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
