@@ -1,0 +1,25 @@
+{
+  "name": "nuclear-launch-crt",
+  "version": "1.0.0",
+  "description": "Simulation of a nuclear launch system using CRT-based secret sharing in C++. A launch code is split into 5 encrypted shares and sent via WhatsApp. At least 3 valid shares are required to authorize launch. Any wrong or insufficient shares abort it. Secrets are discarded after use.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manu-1-1/Nuclear-Launch-CRT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manu-1-1/Nuclear-Launch-CRT/issues"
+  },
+  "homepage": "https://github.com/manu-1-1/Nuclear-Launch-CRT#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
