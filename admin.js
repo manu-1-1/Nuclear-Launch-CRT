@@ -6,17 +6,35 @@ const timerDisplay=document.getElementById('timer');
 const launchMessage=document.getElementById('launch-message');
 
 let countdown;
-abortBtn.disabled=true; 
-launchBtn.disabled=true; 
+abortBtn.disabled=true;
+launchBtn.disabled=true;
 
 window.onload=()=>{
     abortBtn.disabled=true;
     launchBtn.disabled=true;
     const urlParams=new URLSearchParams(window.location.search);
     const status=urlParams.get('status');
+    const sharesStr=urlParams.get('shares');
+
+    if(sharesStr){
+        const ids=sharesStr.split(',');
+        ids.forEach(id=>{
+            const box=document.getElementById(`vminister${id}`);
+            if(box){
+                if(status==='success'){
+                    box.classList.add('verified-success');
+                    box.innerHTML+='<br><i class="fas fa-check-circle"></i> Verified';
+                }else{
+                    box.classList.add('verified-fail');
+                    box.innerHTML+='<br><i class="fas fa-times-circle"></i> Invalid';
+                }
+            }
+        });
+    }
+
     if(status==='success'){
         launchMessage.innerHTML='<span style="color: green; font-weight: bold; font-size: 1.5em;">LAUNCH SEQUENCE INITIATED: AUTHORIZED</span>';
-        localStorage.removeItem('crtSessionId'); 
+        localStorage.removeItem('crtSessionId');
     }else if(status==='failed'){
         launchMessage.innerHTML='<span style="color: red; font-weight: bold; font-size: 1.5em;">LAUNCH SEQUENCE ABORTED: UNAUTHORIZED</span>';
         localStorage.removeItem('crtSessionId');
@@ -24,28 +42,28 @@ window.onload=()=>{
 };
 
 generateBtn.addEventListener('click',async()=>{
-    try {
+    try{
         generateBtn.disabled=true;
         launchMessage.textContent='Generating...';
 
-        progressBar.style.width = '50%';
+        progressBar.style.width='50%';
         const response=await fetch('/api/generate',{method:'POST'});
         const data=await response.json();
-        if (data.error) throw new Error(data.error);
+        if(data.error)throw new Error(data.error);
 
-        localStorage.setItem('crtSessionId', data.sessionId);
+        localStorage.setItem('crtSessionId',data.sessionId);
         progressBar.style.width='100%';
+
         data.shares.forEach(s=>{
             const box=document.getElementById(`minister${s.id}`);
             if(box){
-                box.innerHTML=`<strong>Minister ${s.id}</strong><br><small>Ready for manual entry</small>`;
                 box.classList.add('generated');
             }
         });
 
         launchMessage.textContent='Shares Generated. Ready to Initiate Launch.';
-        abortBtn.disabled = false;
-        launchBtn.disabled = false;
+        abortBtn.disabled=false;
+        launchBtn.disabled=false;
         startTimer();
 
     }catch(e){
@@ -58,11 +76,11 @@ generateBtn.addEventListener('click',async()=>{
 
 abortBtn.addEventListener('click',async()=>{
     const sessionId=localStorage.getItem('crtSessionId');
-    if (sessionId){
+    if(sessionId){
         await fetch('/api/abort',{
             method:'POST',
-            headers:{ 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId })
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({sessionId:sessionId})
         });
         localStorage.removeItem('crtSessionId');
     }
@@ -74,13 +92,13 @@ launchBtn.addEventListener('click',()=>{
 });
 
 function startTimer(){
-    let timeLeft=300; 
+    let timeLeft=300;
     clearInterval(countdown);
     countdown=setInterval(()=>{
         const m=Math.floor(timeLeft/60);
         const s=timeLeft%60;
-        timerDisplay.textContent=`Session Expires in: ${m}:${s<10 ?'0':''}${s}`;
-        if(timeLeft<=0) {
+        timerDisplay.textContent=`Session Expires in: ${m}:${s<10?'0':''}${s}`;
+        if(timeLeft<=0){
             clearInterval(countdown);
             localStorage.removeItem('crtSessionId');
             alert('Session Expired!');
