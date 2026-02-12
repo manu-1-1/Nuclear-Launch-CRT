@@ -1,4 +1,4 @@
-# Nuclear-Launch code sharing : A CRT Secret Sharing System
+# CRT Secret Sharing System
 
 A web-based secret sharing application implementing a Chinese Remainder Theorem (CRT) based threshold scheme. This project utilizes a hybrid architecture with a Node.js backend for session management and a C++ core for cryptographic calculations.
 
@@ -19,37 +19,30 @@ This system allows an administrator ("dealer") to generate a secret number and s
 ## Prerequisites
 
 - **Node.js** (v14 or higher recommended)
-- **g++** (MinGW or any standard C++ compiler) for building the core executable.
 
-## Installation
+## Quick Start
 
-1.  **Clone the repository**:
-    ```bash
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
-
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-
-3.  **Compile the C++ core**:
-    Ensure `g++` is in your system PATH.
-    ```bash
-    g++ NLC.cpp -o NLC.exe
-    ```
-    *Note: On Linux/Mac, output as `NLC` and update `server.js` to run `./NLC` instead of `NLC.exe`.*
-
-## Usage
+Since the project includes pre-installed dependencies and the compiled executable, you can start it immediately.
 
 1.  **Start the server**:
     ```bash
     npm start
     ```
-    The server works on port `3000` by default.
+    *(If you encounter dependency issues, run `npm install` to repair them, but this is usually not needed.)*
 
-2.  **Generate a Secret**:
+2.  **Access the Application**:
+    -   Admin Panel: `http://localhost:3000/admin.html`
+    -   Minister Panel: `http://localhost:3000/minister.html`
+
+### Re-compilation (Optional)
+If you modify `NLC.cpp` or need to recompile for a different platform:
+```bash
+g++ NLC.cpp -o NLC.exe
+```
+
+## Usage Guide
+
+1.  **Generate a Secret**:
     -   Navigate to `http://localhost:3000/admin.html`.
     -   Click **Generate Secret**.
     -   The system will display the **Session ID** and the **Public Moduli** for each minister.
